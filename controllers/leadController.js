@@ -1,27 +1,43 @@
 const Lead = require('../models/Lead');
 
 exports.submitLead = async (req, res) => {
-  const { name, email, course_interest } = req.body;
-  const lead = new Lead({ name, email, course_interest });
-  await lead.save();
-  res.json({ message: 'Lead submitted', lead });
+  try {
+    const { name, email, phone, message } = req.body;
+    const lead = await Lead.create({ name, email, phone, message });
+    res.status(201).json({ message: 'Lead submitted successfully', lead });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 };
 
 exports.fetchUnclaimedLeads = async (req, res) => {
-  const leads = await Lead.find({ claimed_by: null });
-  res.json({ leads });
+  try {
+    const leads = await Lead.find({ claimedBy: null });
+    res.json(leads);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 };
 
 exports.claimLead = async (req, res) => {
-  const { leadId } = req.body;
-  const lead = await Lead.findById(leadId);
-  if (!lead || lead.claimed_by) return res.status(400).json({ error: 'Lead not found or already claimed' });
-  lead.claimed_by = req.user.id;
-  await lead.save();
-  res.json({ message: 'Lead claimed', lead });
+  try {
+    const { leadId } = req.body;
+    const lead = await Lead.findByIdAndUpdate(
+      leadId,
+      { claimedBy: req.employee.employeeId },
+      { new: true }
+    );
+    res.json({ message: 'Lead claimed', lead });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 };
 
 exports.fetchClaimedLeads = async (req, res) => {
-  const leads = await Lead.find({ claimed_by: req.user.id });
-  res.json({ leads });
+  try {
+    const leads = await Lead.find({ claimedBy: req.employee.employeeId });
+    res.json(leads);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 };

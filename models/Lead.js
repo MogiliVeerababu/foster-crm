@@ -6,3 +6,5 @@ const leadSchema = new mongoose.Schema({
   claimed_by: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', default: null }
 });
 module.exports = mongoose.model('Lead', leadSchema);
+
+

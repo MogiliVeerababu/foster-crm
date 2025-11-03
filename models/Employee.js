@@ -1,10 +1,9 @@
-
-
-
 const mongoose = require('mongoose');
+
 const employeeSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true },
-  password: String
-}, { timestamps: true }); // <= This adds "createdAt" and "updatedAt"
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+});
+
 module.exports = mongoose.model('Employee', employeeSchema);
