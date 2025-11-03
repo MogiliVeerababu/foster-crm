@@ -1,4 +1,3 @@
-// app.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -8,9 +7,9 @@ const helmet = require('helmet');
 const app = express();
 
 // ✅ Security & Middleware
-app.use(helmet());          // Secure HTTP headers
-app.use(cors());            // Enable Cross-Origin Resource Sharing
-app.use(express.json());    // Parse JSON bodies
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
 
 // ✅ Database Connection
 mongoose.connect(process.env.MONGODB_URI, {
@@ -20,7 +19,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   .then(() => console.log('✅ MongoDB connected'))
   .catch((err) => {
     console.error('❌ MongoDB connection error:', err.message || err);
-    process.exit(1); // Stop process if DB connection fails
+    process.exit(1);
   });
 
 // ✅ Routes
@@ -37,5 +36,3 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`🚀 Server started on port ${PORT}`);
 });
-
-

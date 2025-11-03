@@ -1,20 +1,50 @@
-// routes/leadRoutes.js
 const express = require('express');
 const router = express.Router();
-const leadController = require('../controllers/leadController');
-const auth = require('../middlewares/authMiddleware');
+const Lead = require('../models/Lead');
 
-// public: client submits lead
-router.post('/submit', leadController.submitLead);
+// POST: /api/leads/submit
+router.post('/submit', async (req, res) => {
+  try {
+    const { name, email, phone, course_interest } = req.body;
 
-// public: fetch unclaimed leads (visible to all employees as public enquiries)
-router.get('/public', leadController.fetchUnclaimedLeads);
+    // Basic validation
+    if (!name || !email || !course_interest) {
+      return res.status(400).json({ message: "Name, email, and course_interest are required." });
+    }
 
-// protected: claim a lead (assign to logged in employee)
-router.post('/claim', auth, leadController.claimLead);
+    const newLead = new Lead({
+      name,
+      email,
+      phone,
+      course_interest,
+    });
 
-// protected: fetch leads claimed by logged in employee (private enquiries)
-router.get('/private', auth, leadController.fetchClaimedLeads);
+    await newLead.save();
+
+    res.status(201).json({
+      message: "Lead created successfully",
+      lead: newLead,
+    });
+  } catch (error) {
+    console.error("Error creating lead:", error);
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+});
+
+// GET: /api/leads
+router.get('/', async (req, res) => {
+  try {
+    const leads = await Lead.find();
+    res.status(200).json(leads);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch leads",
+      error: error.message,
+    });
+  }
+});
 
 module.exports = router;
-
